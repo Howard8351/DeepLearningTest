@@ -545,7 +545,8 @@ if __name__ == '__main__':
             #    gmodel.trainable = False
             #    dmodel.trainable = True
 
-       
+        reality_image_dataset_iterator = iter(reality_image_dataset)
+        Animation_image_dataset_iterator = iter(Animation_image_dataset)
         for epoch in range(epochs):
             g_reality_loss_list   = []
             g_Animation_loss_list = []
@@ -557,8 +558,8 @@ if __name__ == '__main__':
             while step < steps_each_epoch:
                 start_time = time.time()
                 #從dataset batch匯入檔案
-                batch_label, batch_reality_image = next(iter(reality_image_dataset))
-                batch_label, batch_Animation_image = next(iter(Animation_image_dataset))
+                batch_label, batch_reality_image = next(reality_image_dataset_iterator)
+                batch_label, batch_Animation_image = next(Animation_image_dataset_iterator)
                 #batch_glabel = label_process(batch_label, glabel)
                 #batch_dlabel = label_process(batch_label, dlabel)
                 output_list = model_training(gmodel_reality_to_Animation, gmodel_reality_to_Animation_optimizer,
@@ -679,12 +680,13 @@ if __name__ == '__main__':
 
         label = ['reality', 'animation']
         print()
+        train_image_dataset_iterator = iter(train_image_dataset)
         for epoch in range(epochs):
             step = 0
             loss_list = []
             while step < steps_each_epoch:
                 start_time = time.time()
-                batch_label, batch_image = next(iter(train_image_dataset))
+                batch_label, batch_image = next(train_image_dataset_iterator)
                 batch_label = label_process(batch_label, label)
                 loss_list.append(classification_loss(cmodel, cmodel_optimizer, batch_image, batch_label))
                 step += 1
@@ -706,8 +708,9 @@ if __name__ == '__main__':
         step = 0
         acc_list = []
         label = ['reality', 'animation']
+        train_image_dataset_iterator = iter(train_image_dataset)
         while step < steps_each_epoch:
-            batch_label, batch_image = next(iter(train_image_dataset))
+            batch_label, batch_image = next(train_image_dataset_iterator)
             batch_label = label_process(batch_label, label)
             predict = tf.round(cmodel.predict(batch_image))
             predict = tf.math.equal(batch_label, predict)
